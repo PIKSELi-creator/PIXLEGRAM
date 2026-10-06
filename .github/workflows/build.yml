@@ -8,17 +8,32 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout PIXLEGRAM
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - run: chmod +x gradlew
-      - run: ./gradlew :TMessagesProj_App:assembleDebug --no-daemon
+      - name: Check source files
+        run: |
+          echo "Checking media module..."
+          test -f TMessagesProj_Modules/media/core_settings.gradle
+          echo "core_settings.gradle FOUND"
 
-      - uses: actions/upload-artifact@v4
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
+      - name: Build PIXLEGRAM APK
+        run: ./gradlew :TMessagesProj_App:assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: PIXLEGRAM-APK
           path: TMessagesProj_App/build/outputs/apk/**/*.apk
