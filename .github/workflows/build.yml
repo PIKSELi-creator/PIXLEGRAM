@@ -1,87 +1,24 @@
-name: Build PIXLEGRAM APK
+name: Build PIXLEGRAM
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   build:
-    name: Build PIXLEGRAM Debug APK
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - run: chmod +x gradlew
+      - run: ./gradlew :TMessagesProj_App:assembleDebug --no-daemon
 
-      - name: Install Android SDK components
-        run: |
-          sdkmanager "platforms;android-36" \
-                     "build-tools;36.0.0" \
-                     "platform-tools"
-
-      - name: Set up Gradle permissions
-        run: chmod +x ./gradlew
-
-      - name: Configure PIXLEGRAM API credentials
-        env:
-          PIXLEGRAM_API_ID: ${{ secrets.PIXLEGRAM_API_ID }}
-          PIXLEGRAM_API_HASH: ${{ secrets.PIXLEGRAM_API_HASH }}
-        run: |
-          python3 <<'PY'
-          import os
-          from pathlib import Path
-
-          path = Path(
-              "TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java"
-          )
-
-          text = path.read_text()
-
-          api_id = os.environ["PIXLEGRAM_API_ID"]
-          api_hash = os.environ["PIXLEGRAM_API_HASH"]
-
-          text = text.replace(
-              'public static int APP_ID = 4;',
-              f'public static int APP_ID = {api_id};'
-          )
-
-          import re
-
-          text = re.sub(
-              r'public static String APP_HASH = "[^"]*";',
-              f'public static String APP_HASH = "{api_hash}";',
-              text
-          )
-
-          path.write_text(text)
-          PY
-
-      - name: Build PIXLEGRAM APK
-        run: |
-          ./gradlew :TMessagesProj_App:assembleDebug --no-daemon
-
-      - name: Find APK
-        run: |
-          find TMessagesProj_App/build/outputs/apk -type f -name "*.apk" -print
-
-      - name: Upload PIXLEGRAM APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: PIXLEGRAM-debug
+          name: PIXLEGRAM-APK
           path: TMessagesProj_App/build/outputs/apk/**/*.apk
-          if-no-files-found: error
-          retention-days: 14
