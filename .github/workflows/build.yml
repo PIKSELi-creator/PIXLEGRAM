@@ -11,7 +11,7 @@ jobs:
       - name: Checkout PIXLEGRAM
         uses: actions/checkout@v4
         with:
-          submodules: false
+          submodules: recursive
           fetch-depth: 0
 
       - name: Setup Java
@@ -20,11 +20,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Check source files
+      - name: Check source
         run: |
-          echo "Checking media module..."
           test -f TMessagesProj_Modules/media/core_settings.gradle
-          echo "core_settings.gradle FOUND"
+          test -f TMessagesProj/lib/jlatexmath/jlatexmath/build.gradle
+          echo "Source check OK"
 
       - name: Make Gradle executable
         run: chmod +x gradlew
