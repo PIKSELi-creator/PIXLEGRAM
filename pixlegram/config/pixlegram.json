@@ -1,7 +1,15 @@
 {
-    "name": "PIXLEGRAM",
-    "version": "1.0.0",
-    "gifts": true,
-    "ghost_mode": true,
-    "privacy_features": true
+  "name": "PIXLEGRAM",
+  "version": "1.0.0",
+  "telegram_client": true,
+  "telegram_api": true,
+  "telegram_auth": true,
+  "channels": true,
+  "groups": true,
+  "messages": true,
+  "media": true,
+  "gifts": true,
+  "gift_showcase": true,
+  "google_email_auth": true,
+  "build": "github-actions"
 }
